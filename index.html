@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <style>
+        .rotating-container{
+            transform-style: preserve-3d;
+            position: relative;
+        }
+        .rotaing-item{
+            position: absolute;
+            top:0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            margin: auto;
+        }
+        body{
+            height: 2000px;
+        }
+        .rotating-container{
+            margin-top: 300px;
+        }
+    </style>
+    <div class="rotating-container"></div>
+    <script>
+        function generateRotating(dom,perWidth,perHeight,eleses,angle,multiple,timeCount,perspective){
+            var n=eleses[0].length,
+                group=eleses.length,
+                timeCount=timeCount|| 0,
+                translateZ=perWidth/2*Math.tan((n-2)*Math.PI/n/2)*multiple,
+                perspective=perspective||translateZ*2;
+            dom.classList.add("rotating-container");
+            dom.style.perspective=perspective+"px";
+            dom.innerHTML="";
+            eleses.forEach(function(eles,i){
+                eles.forEach(function(ele,idx){
+                    ele.classList.add("rotaing-item");
+                    ele.style.width=perWidth+"px";
+                    ele.style.height=perHeight+"px";
+                    var k=(group-1)/2-i;
+                    var currentRotatexAngle=angle*k;
+                    ele.style.transform="rotateY("+(idx*360/n+timeCount)+"deg) translateY("+(-k)*perHeight+"px) translateZ("+translateZ+"px) rotatex("+currentRotatexAngle+"deg)";
+                    ele.style.transformOrigin=i<group/2?"bottom center":"top center";
+                    if(k>0){
+                        ele.style.clipPath="polygon("+Math.cos((n-2)*Math.PI/n/2)*Math.cos(Math.PI/2-Math.PI*currentRotatexAngle/180)*perHeight+"px 0,0 100%,100% 100%,"+(perWidth-Math.cos((n-2)*Math.PI/n/2)*Math.cos(Math.PI/2-Math.PI*currentRotatexAngle/180)*perHeight)+"px 0)";
+                    }else if(k==0){
+                    }else{
+                        ele.style.clipPath="polygon(0 0,"+Math.cos((n-2)*Math.PI/n/2)*Math.cos(-Math.PI/2-Math.PI*currentRotatexAngle/180)*perHeight+"px 100%,"+(perWidth-Math.cos((n-2)*Math.PI/n/2)*Math.cos(-Math.PI/2-Math.PI*currentRotatexAngle/180)*perHeight)+"px 100%,100% 0)";
+                    }
+                    dom.appendChild(ele);
+                });
+            });
+        }
+        var eleses=[[],[],[]];
+        for(var i=0;i<18;i++){
+            var ele=document.createElement("div");
+            ele.style.backgroundColor="rgba("+Math.floor(Math.random()*255)+","+Math.floor(Math.random()*255)+","+Math.floor(Math.random()*255)+",.9)";
+            eleses[0].push(ele);
+            eleses[1].push(ele.cloneNode(true));
+            eleses[2].push(ele.cloneNode(true));
+        };
+        var count=0;
+        var angle=0;
+        var width=0;
+        var height=0;
+        var grow=1;
+        var multiple=1;
+        setInterval(function(){
+            if(++count==360){
+                count=0;
+                multiple+=.5;
+                if(multiple==3){
+                    multiple=1;
+                }
+            }
+            if(++angle==360){
+                angle=0;
+            }
+            width+=grow;
+            height+=grow;
+            if(width==360||width==0){
+                grow=-grow;
+            }
+            generateRotating(document.querySelector(".rotating-container"),width *.5,height *.5,eleses,angle,multiple,count *.5);
+        },50);
+    </script>
+
+</body>
+</html>
